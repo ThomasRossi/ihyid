@@ -26,7 +26,7 @@ Note that `uscadi` is different node by node because the secrets are different e
 
 Node _A_ will create a list of its `uscadi`s and the 32 bytes noises and send the two lists to node _B_. Node _B_ will try combinations of its local phonetic ids, the received 32 bytes noises until it finds an `uscadi` matching one in the received list. Every match means that node _B_ knows the same phonetic id of node _A_ and thus knows that same contact. This is discovered without sharing contact details over the wire. The hash of the phonetic id is personal data under GDPR, so that is why phonetic ids canot be shared over the wire.
 
-The test are the easiest way to see the logics at work: [Contact Service Test](app/test/test_contact_service.py)
+The test are the easiest way to see the logics at work: [test_contact_service.py](app/test/test_contact_service.py)
 
 ### Future Developments
 
