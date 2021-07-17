@@ -2,11 +2,11 @@
 
 ## Description
 
-This project is a prototype for a peer to peer system where organisations collect lists of contacts, deduplicate them based on phonetics and then shares anonimised version of the contacts between themeselves to check which contacts they have in common wihtout sharing personal information.  
+This project is a prototype for a peer to peer system where organisations collect lists of contacts, deduplicate them based on phonetics and then shares anonimised version of the contacts to check which contacts organisations have in common wihtout sharing personal information.  
 
-The project is a Flask+RestPlus server which generates the swagger documentation to interact with it. Most endpoints follow the REST structure, custom actions are identified by the /rpc/ token in their url.
+The project is a Flask+RestPlus API server. Most endpoints follow the REST structure, custom actions are identified by the /rpc/ token in the url. Running the server runs the swagger documentation which explains all endpoints.
 
-![Ihyih running](Ihyid.png "Ihyih running")
+![Ihyih running](ihyid.png "Ihyih running")
 
 ## Documentation
 
@@ -16,7 +16,7 @@ Here is a summary of the current capabilities of Ihyid nodes:
 
 + save new contacts, compute their phonetic ids, create a 32 byte noise, concatenate the two and hash to create the `uscadi` id (unique, singular, common, anonymous deduplication, identifier aka `uscadi`)
 + check for duplicates based on phonetic ids
-+ accept a list of uscadi and secrets (shuffled) from another node and respond which are known and which are unknown
++ accept a list of uscadi and secrets (list of anonymous contacts) from another node and respond with known/unknown
 + register a new node representing another organisation collecting contacts
 + API access level is different for admin users and normal users (e.g. admin can load and see contacts, normal user can only check anon lists)
 
@@ -24,7 +24,7 @@ Note that `uscadi` is different node by node because the secrets are different e
 
 ### Anonymous checks
 
-Node A will create a list of its `uscadi`s and the 32 bytes noises and send the two lists to node B. Node B will try combinations of its local phonetic ids, the received 32 bytes noises until it find an `uscadi` matching one of the received list. This means that node B knows the same phonetic id of node A and thus know that same contact. This is discovered without sharing contact details over the wire. The hash of the phonetic id is personal data under GDPR, so that is why phonetic ids canot be shared over the wire.
+Node _A_ will create a list of its `uscadi`s and the 32 bytes noises and send the two lists to node _B_. Node _B_ will try combinations of its local phonetic ids, the received 32 bytes noises until it finds an `uscadi` matching one in the received list. Every match means that node _B_ knows the same phonetic id of node _A_ and thus knows that same contact. This is discovered without sharing contact details over the wire. The hash of the phonetic id is personal data under GDPR, so that is why phonetic ids canot be shared over the wire.
 
 The test are the easiest way to see the logics at work: [Contact Service Test](app/test/test_contact_service.py)
 
@@ -34,13 +34,15 @@ The test are the easiest way to see the logics at work: [Contact Service Test](a
 + more nodes can be invited to join a distribution list, they'll need to negotiate who is serving which contact without exchanging the contact details
 + extend the p2p workflows to create the negotiation between nodes
 + add a user interface
++ avoid non standard operations, e.g. use HMAC to generate `uscadi`, JSON canonical form to represent phonetic ids, etc..
++ introduce DIDs
 
 The current working in progress list is in Issues
 
 
 ## Installation
 
-> All this instruction should be replicated in a container
+> All this instruction should be replicated in a container. 
 > This software is written for Python 3+
 
 To use Ihyid it is recommended to install virtualenvwrapper:
@@ -69,7 +71,7 @@ The repository comes with a template config file (`config_template.py`) that you
 The basic configuration uses SQLlite as testing db and redis as broker/backend for celery. The other options are:
 
 + `ADMIN_EMAIL`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` the admin user details created at startup
-+ `KMI_TYPE`, the type of key management infrastructure, for testing and developing there's an implementation which creates a private key file in the project folder (`DEV`), the stanard one for production is under development `PYKMIP`.
++ `KMI_TYPE`, the type of key management infrastructure, for testing and developing there's an implementation which creates a private key file in the project folder (`DEV`), the stanard one for production is under development `PYKMIP`. When DIDs will be introduced ndoes will need to handle their own private keys and this is a basic infrastructure for that.
 + `LOCAL_FLASK_PORT`, which port will be used for Flask in localhost
 + `EONPASS_USER`, `PWD` and `URL`, will be the details to connect Ihyid to Eonpass for blockchain operations (like notarising the signatures). At the moment they are not used.
 + `key`, `SECRET_KEY`, is the one used to initialise `bcrypt` (standard for JWT tokens) and is passed via environment variable 
