@@ -77,8 +77,8 @@ class ContactDto:
                                 description='Mother\'s first name of the contact, used in phoenetic id if present'),
         'fatherr_first_name': fields.String(required=False,
                                 description='Father\'s first name of the contact, used in phoenetic id if present'),
-        'date_of_birth': fields.Date(required=True,
-                                description='date of birth, used in phoenetic id if present')
+        'date_of_birth': fields.String(required=True,
+                                description='date of birth, used in phoenetic id if present, UTC fromatted like %Y-%m-%d')
     })
     new_contact = api.model('new_contact', {
         'first_name': fields.String(required=True,
@@ -89,8 +89,8 @@ class ContactDto:
                                 description='Mother\'s first name of the contact, used in phoenetic id if present'),
         'fatherr_first_name': fields.String(required=False,
                                 description='Father\'s first name of the contact, used in phoenetic id if present'),
-        'date_of_birth': fields.Date(required=True,
-                                description='date of birth, used in phoenetic id if present')
+        'date_of_birth': fields.String(required=True,
+                                description='date of birth, used in phoenetic id if present, UTC fromatted like %Y-%m-%d')
     })
     contact_to_update = api.model('contact_to_update', {
         'id': fields.String(required=True,
@@ -103,8 +103,8 @@ class ContactDto:
                                 description='Mother\'s first name of the contact, used in phoenetic id if present'),
         'fatherr_first_name': fields.String(required=False,
                                 description='Father\'s first name of the contact, used in phoenetic id if present'),
-        'date_of_birth': fields.Date(required=True,
-                                description='date of birth, used in phoenetic id if present')
+        'date_of_birth': fields.String(required=True,
+                                description='date of birth, used in phoenetic id if present, UTC fromatted like %Y-%m-%d')
     })
     new_contact_list = api.model('contact_list', {
         'records':fields.List(fields.Nested(new_contact)),

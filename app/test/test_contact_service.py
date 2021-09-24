@@ -18,12 +18,14 @@ class TestContactService(BaseTestCase):
         """
         insert a single new contact and check against expects data
         """
+        date_of_birth = datetime.datetime(1976, 5, 7).strftime("%Y-%m-%d")
+
         payload = {
             'first_name': 'Houman',
             'last_name' : 'Haddad',
             'mother_first_name' : 'Barbara',
             'father_first_name' : 'Michael',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth
         }
         insert_response = save_new_contact(payload)
         self.assertTrue(insert_response[0]['status'] == 'success')
@@ -41,26 +43,27 @@ class TestContactService(BaseTestCase):
         """
         insert an array fo contacts, wiht one phonetic dublicate, and check the result array
         """
+        date_of_birth = datetime.datetime(1976, 5, 7).strftime("%Y-%m-%d")
         contact1 = {
             'first_name': 'Houman',
             'last_name' : 'Haddad',
             'mother_first_name' : 'Barbara',
             'father_first_name' : 'Michael',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth
         }
         contact2 = {
             'first_name': 'Hooman',
             'last_name' : 'Haddad',
             'mother_first_name' : 'Barbara',
             'father_first_name' : 'Michael',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth
         }
         contact3 = {
             'first_name': 'Herman',
             'last_name' : 'Niederkoffler',
             'mother_first_name' : 'Marta',
             'father_first_name' : 'Hans',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth
         }
         payload = [contact1, contact2, contact3]
         insert_response = save_new_contacts(payload)
@@ -73,26 +76,30 @@ class TestContactService(BaseTestCase):
         """
         Insert a couple fo contacts, then get 3 anon contacts and check if you know them
         """
+        date_of_birth = datetime.datetime(1976, 5, 7)
+        date_of_birth_str = date_of_birth.strftime("%Y-%m-%d")
+
         contact1 = {
             'first_name': 'Houman',
             'last_name' : 'Haddad',
             'mother_first_name' : 'Barbara',
             'father_first_name' : 'Michael',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth_str
         }
         contact2 = {
             'first_name': 'Herman',
             'last_name' : 'Niederkoffler',
             'mother_first_name' : 'Marta',
             'father_first_name' : 'Hans',
-            'date_of_birth' : datetime.datetime(1976, 5, 7)
+            'date_of_birth' : date_of_birth_str
         }
         payload = [contact1, contact2]
         insert_response = save_new_contacts(payload)
 
         """
         Prepare anon contacts:
-        same anagraphic data for 2, but different secrets, thus differenct uscadi
+        same anagraphic data for 2, but different secrets, thus different uscadi
+        to create contacts on another node I just create the object without saving it into the db
         """
         arandom1 = os.urandom(32)
         acontact1 = Contact(
@@ -100,7 +107,7 @@ class TestContactService(BaseTestCase):
             last_name="Haddad",
             mother_first_name="Barbara",
             father_first_name="Michael",
-            date_of_birth=datetime.datetime(1976, 5, 7),
+            date_of_birth=date_of_birth,
             secret=arandom1,
             created_on=datetime.datetime.utcnow()
         )
@@ -112,7 +119,7 @@ class TestContactService(BaseTestCase):
             last_name="Niederkoffler",
             mother_first_name="Marta",
             father_first_name="Hans",
-            date_of_birth=datetime.datetime(1976, 5, 7),
+            date_of_birth=date_of_birth,
             secret=arandom2,
             created_on=datetime.datetime.utcnow()
         )
@@ -124,23 +131,23 @@ class TestContactService(BaseTestCase):
             last_name="Niederhoffler",
             mother_first_name="Gemma",
             father_first_name="Artie",
-            date_of_birth=datetime.datetime(1976, 5, 7),
+            date_of_birth=date_of_birth,
             secret=arandom3,
             created_on=datetime.datetime.utcnow()
         )
         acontact3.phonetic_id = acontact3.fresh_phonetic_id
         acontact3.uscadi = acontact3.fresh_uscadi
-
+        
         """
         The payload has 2 array: uscadis, secrets with unordered lists of uscadi and secret respectively
         """
-
         uscadis = [acontact1.uscadi, acontact2.uscadi, acontact3.uscadi]
         random.shuffle(uscadis)
         secrets = [arandom1.hex(), arandom2.hex(), arandom3.hex()]
         random.shuffle(secrets)
 
         payload = {"secrets":secrets, "uscadis":uscadis}
+        print(payload)
         check_response = check_contacts(payload)
         self.assertTrue(check_response[1]==200)
         for res in check_response[0]:

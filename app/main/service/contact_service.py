@@ -10,20 +10,30 @@ from app.main.util.hashutils import HashUtils
 
 def save_new_contact(data):
     try:
+        date_of_birth = None
+        if(type(data["date_of_birth"]) is str ):
+            try:
+                date_of_birth =  datetime.datetime.strptime(data["date_of_birth"], '%Y-%m-%d')
+            except Exception as e:
+                print(e)
+                raise EonError('Wrong datetime format, please use UTC and this format %Y-%m-%d', 409)
+
         new_contact = Contact(
             first_name=data["first_name"],
             last_name=data["last_name"],
             mother_first_name=data.get("mother_first_name",None),
             father_first_name=data.get("father_first_name",None),
-            date_of_birth=data["date_of_birth"],
+            date_of_birth=date_of_birth,
             secret=os.urandom(32),
             created_on=datetime.datetime.utcnow()
         )
+        # concetto di lista - import e collegamento contatti lista
+        # 
         new_contact.phonetic_id = new_contact.fresh_phonetic_id
         new_contact.uscadi = new_contact.fresh_uscadi
         save_changes(new_contact) 
         return generate_creation_ok_message(new_contact)
-    except:
+    except Exception as e:
         db.session.rollback()
         raise EonError('Another contact already exists with the given data.', 409)
 
@@ -103,8 +113,9 @@ def check_contacts(data):
                     response_array.append({"uscadi":uscadi, "known":"false"})
         
         return response_array, 200
-    except:
-       raise EonError('Internal Server Error.', 500)    
+    except Exception as e:
+        print(e)
+        raise EonError('Internal Server Error.', 500)    
 
 def get_phonetic_id(contact):
     return contact.phonetic_id
