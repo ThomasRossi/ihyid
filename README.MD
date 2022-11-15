@@ -37,7 +37,7 @@ The test are the easiest way to see the logics at work: [test_contact_service.py
 + avoid non standard operations, e.g. use HMAC to generate `uscadi`, JSON canonical form to represent phonetic ids, etc..
 + introduce DIDs
 
-The current working in progress list is in Issues
+The current working in progress list is in Issues.
 
 
 ## Installation
